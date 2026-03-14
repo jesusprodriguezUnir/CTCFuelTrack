@@ -49,7 +49,7 @@ export default function RegistroManual() {
     if (error) {
       setStatus({ type: 'error', msg: error.message || 'Error al guardar el registro.' });
     } else {
-      setStatus({ type: 'success', msg: 'Repostaje manual registrado precticando en la base de datos.' });
+      setStatus({ type: 'success', msg: 'Repostaje manual registrado correctamente en la base de datos.' });
       setFormData({ maquina_id: '', litros_repostados: '' });
     }
   };
