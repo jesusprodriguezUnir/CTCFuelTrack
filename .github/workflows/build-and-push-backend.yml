@@ -11,6 +11,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
 
@@ -27,6 +29,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set lowercase image tags
+        run: |
+          repo_full="$GITHUB_REPOSITORY"
+          owner=$(echo "$repo_full" | cut -d'/' -f1 | tr '[:upper:]' '[:lower:]')
+          repo=$(echo "$repo_full" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_TAG1=ghcr.io/${owner}/${repo}-backend:${GITHUB_SHA}" >> $GITHUB_ENV
+          echo "IMAGE_TAG2=ghcr.io/${owner}/${repo}-backend:latest" >> $GITHUB_ENV
+
       - name: Build and push image
         uses: docker/build-push-action@v4
         with:
@@ -36,11 +46,3 @@ jobs:
           tags: |
             ${{ env.IMAGE_TAG1 }}
             ${{ env.IMAGE_TAG2 }}
-
-      - name: Set lowercase image tags
-        run: |
-          repo_full="$GITHUB_REPOSITORY"
-          owner=$(echo "$repo_full" | cut -d'/' -f1 | tr '[:upper:]' '[:lower:]')
-          repo=$(echo "$repo_full" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
-          echo "IMAGE_TAG1=ghcr.io/${owner}/${repo}-backend:${GITHUB_SHA}" >> $GITHUB_ENV
-          echo "IMAGE_TAG2=ghcr.io/${owner}/${repo}-backend:latest" >> $GITHUB_ENV
