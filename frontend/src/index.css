@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn-primary {
+    @apply bg-veolia-600 hover:bg-veolia-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .input-field {
+    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-veolia-500 focus:ring-veolia-500 sm:text-sm px-4 py-2 border disabled:bg-gray-100;
+  }
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden;
+  }
+}
