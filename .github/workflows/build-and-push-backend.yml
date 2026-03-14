@@ -34,5 +34,13 @@ jobs:
           file: Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ toLower(github.repository_owner) }}/${{ toLower(github.event.repository.name) }}-backend:${{ github.sha }}
-            ghcr.io/${{ toLower(github.repository_owner) }}/${{ toLower(github.event.repository.name) }}-backend:latest
+            ${{ env.IMAGE_TAG1 }}
+            ${{ env.IMAGE_TAG2 }}
+
+      - name: Set lowercase image tags
+        run: |
+          repo_full="$GITHUB_REPOSITORY"
+          owner=$(echo "$repo_full" | cut -d'/' -f1 | tr '[:upper:]' '[:lower:]')
+          repo=$(echo "$repo_full" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_TAG1=ghcr.io/${owner}/${repo}-backend:${GITHUB_SHA}" >> $GITHUB_ENV
+          echo "IMAGE_TAG2=ghcr.io/${owner}/${repo}-backend:latest" >> $GITHUB_ENV
