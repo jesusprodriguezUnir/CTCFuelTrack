@@ -90,6 +90,19 @@ uvicorn main:app --reload
 ```
 La API estará disponible en `http://localhost:8000`.
 
+### 5. Arranque con comando único (Windows)
+Desde la raíz del repositorio puedes levantar frontend + backend con un solo comando:
+
+```powershell
+.\scripts\dev.cmd
+```
+
+Opcionalmente puedes cambiar puertos:
+
+```powershell
+.\scripts\dev.cmd -BackendPort 8001 -FrontendPort 5174
+```
+
 ---
 
 ## 🧪 Pruebas Automatizadas (Testing)
@@ -113,7 +126,25 @@ npm run test
 
 ## ☁️ Despliegue en la Nube (Producción)
 
-Para desplegar este repositorio a través de servicios serverless:
+Este repositorio ya incluye workflows para GitHub Actions y despliegue automático.
+
+### Flujo recomendado
+
+- Frontend en Vercel (workflow `.github/workflows/deploy-frontend.yml`)
+- Backend en Render usando imagen publicada en GHCR (workflow `.github/workflows/build-and-push-backend.yml`)
+
+### Secrets necesarios en GitHub
+
+Configura estos secrets en `Settings > Secrets and variables > Actions`:
+
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
+- `RENDER_DEPLOY_HOOK_URL` (opcional, para trigger automático de deploy en Render)
+
+### Configuración por servicio
 
 - **Frontend (Recomendado: Vercel / Netlify)**
   1. Conecta tu cuenta de Github.
@@ -142,7 +173,7 @@ Para desplegar este repositorio a través de servicios serverless:
 Pasos recomendados:
 1. Renombra los ejemplos `.env.example` a `.env` y rellena las claves.
 2. Haz commit y sube el repo a GitHub.
-3. Despliega el frontend en Vercel/Netlify apuntando al subdirectorio `frontend/`.
-4. Despliega el backend en Render/Railway o usando Docker en tu proveedor preferido.
-
-¿Quieres que cree también una configuración de GitHub Actions para CI/CD o un `vercel.json` para Vercel?
+3. Configura los `secrets` en GitHub Actions.
+4. Despliega el frontend en Vercel y vincula el proyecto con tu repositorio.
+5. Crea el servicio backend en Render y añade el `Deploy Hook URL` como secret.
+6. Haz push a `main` para activar CI y despliegue automático.
