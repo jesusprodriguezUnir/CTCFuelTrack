@@ -129,3 +129,20 @@ Para desplegar este repositorio a través de servicios serverless:
 
 ---
 *Desarrollado para la optimización y el rastreo de combustible en Veolia España.*
+
+---
+
+## 🔁 Despliegue rápido (archivos añadidos)
+
+- **`.gitignore`**: Ignora `node_modules`, entornos virtuales y `.env`.
+- **`.env.example`** y **`frontend/.env.example`**: ejemplos para no subir credenciales.
+- **`netlify.toml`**: configuración opcional para desplegar `frontend/` en Netlify (build + SPA redirect).
+- **`backend/Dockerfile`**: Dockerfile básico para desplegar el backend FastAPI en servicios que acepten contenedores.
+
+Pasos recomendados:
+1. Renombra los ejemplos `.env.example` a `.env` y rellena las claves.
+2. Haz commit y sube el repo a GitHub.
+3. Despliega el frontend en Vercel/Netlify apuntando al subdirectorio `frontend/`.
+4. Despliega el backend en Render/Railway o usando Docker en tu proveedor preferido.
+
+¿Quieres que cree también una configuración de GitHub Actions para CI/CD o un `vercel.json` para Vercel?

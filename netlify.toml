@@ -1,0 +1,13 @@
+[build]
+  # Directorio raíz del proyecto a desplegar en Netlify
+  base = "frontend"
+  command = "npm run build"
+  publish = "frontend/dist"
+
+[context.production]
+  command = "npm run build"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
