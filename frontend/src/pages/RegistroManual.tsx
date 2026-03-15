@@ -9,12 +9,13 @@ export default function RegistroManual() {
 
   const [formData, setFormData] = useState({
     maquina_id: '',
-    litros_repostados: ''
+    litros_repostados: '',
+    lectura: ''
   });
 
   useEffect(() => {
     async function loadMaquinas() {
-      const { data } = await supabase.from('maquinaria').select('id, codigo_interno, capacidad_deposito');
+      const { data } = await supabase.from('maquinaria').select('id, codigo_interno, capacidad_deposito, tipo_medicion');
       if (data) setMaquinas(data);
     }
     loadMaquinas();
@@ -39,6 +40,7 @@ export default function RegistroManual() {
       {
         maquina_id: formData.maquina_id,
         litros_repostados: Number(formData.litros_repostados),
+        lectura: Number(formData.lectura),
         tipo_registro: 'manual',
         usuario_id: user?.id || null
       }
@@ -50,7 +52,7 @@ export default function RegistroManual() {
       setStatus({ type: 'error', msg: error.message || 'Error al guardar el registro.' });
     } else {
       setStatus({ type: 'success', msg: 'Repostaje manual registrado correctamente en la base de datos.' });
-      setFormData({ maquina_id: '', litros_repostados: '' });
+      setFormData({ maquina_id: '', litros_repostados: '', lectura: '' });
     }
   };
 
@@ -105,15 +107,32 @@ export default function RegistroManual() {
               />
               <Droplet className="absolute left-3 top-2.5 text-gray-400" size={18} />
             </div>
-            
-            {formData.maquina_id && (
-              <p className="mt-2 text-sm text-gray-500">
-                Límite físico: <span className="font-medium">
-                  {maquinas.find(m => m.id === formData.maquina_id)?.capacidad_deposito} L
-                </span>
-              </p>
-            )}
           </div>
+
+          <div>
+            <label htmlFor="lectura" className="block text-sm font-medium text-gray-700 mb-2">
+              Lectura Actual ({maquinas.find(m => m.id === formData.maquina_id)?.tipo_medicion === 'km' ? 'Kilómetros' : 'Horas'})
+            </label>
+            <input
+              id="lectura"
+              type="number"
+              required
+              min="0"
+              step="0.01"
+              className="input-field"
+              value={formData.lectura}
+              onChange={(e) => setFormData({...formData, lectura: e.target.value})}
+              placeholder={maquinas.find(m => m.id === formData.maquina_id)?.tipo_medicion === 'km' ? "Ej. 125400" : "Ej. 4500.5"}
+            />
+          </div>
+
+          {formData.maquina_id && (
+            <p className="mt-2 text-sm text-gray-500">
+              Límite físico del depósito: <span className="font-medium">
+                {maquinas.find(m => m.id === formData.maquina_id)?.capacidad_deposito} L
+              </span>
+            </p>
+          )}
 
           <div className="pt-4 border-t border-gray-100 flex justify-end">
             <button

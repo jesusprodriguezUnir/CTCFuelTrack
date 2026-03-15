@@ -13,13 +13,16 @@ Esta plataforma proporciona una interfaz web unificada para operarios y un servi
 
 ## 🚀 Características Principales
 
-- 🔐 **Autenticación Segura (Supabase Auth)**: Registro y acceso seguro para operarios, integrado con políticas de seguridad de base de datos (RLS) para garantizar la privacidad de los datos de Veolia.
-- 🏭 **Gestión de Centros y Maquinaria**: Control de máquinas distribuidas por centro, con validación estricta de la capacidad del depósito.
+- 🔐 **Autenticación y Roles (Supabase Auth)**: Acceso seguro con roles diferenciados — **Admin** y **Operario**. El menú y las rutas se adaptan automáticamente según el rol.
+- 🏭 **Gestión de Centros y Maquinaria (Admin)**: CRUD completo de centros operativos y máquinas desde el panel de administración.
+- ⏱️ **Seguimiento de Lecturas (Horas / Km)**: Cada máquina tiene un tipo de medición (horas o kilómetros). Al repostar se registra la lectura actual del contador.
+- 📈 **Cálculo de Consumo**: El Dashboard calcula automáticamente el consumo `L/h` o `L/km` comparando las dos últimas lecturas de cada máquina.
 - ⛽ **Doble Vía de Registro**:
-  - **Manual (TPV)**: Interfaz responsiva donde el operario introduce la máquina y los litros.
-  - **Automático (API)**: Endpoint diseñado para recibir solicitudes de surtidores físicos.
-- 🛡️ **Prevención de Fraude/Error**: Lógica en frontend y backend que bloquea cualquier repostaje que exceda la capacidad técnica del depósito de la máquina seleccionada.
-- 📊 **Dashboard en Tiempo Real**: Visualización del inventario y las extracciones recientes.
+  - **Manual (TPV)**: El operario selecciona la máquina, introduce litros y lectura actual.
+  - **Automático (API)**: Endpoint para recibir repostajes de surtidores físicos.
+- 🛡️ **Prevención de errores**: Bloqueo de repostajes que excedan la capacidad del depósito. Alertas en borrados con datos en cascada.
+- 📋 **Historial completo (Admin)**: Vista paginada con filtros por máquina y fechas, y borrado de registros incorrectos.
+- 👥 **Gestión de Usuarios (Admin)**: Cambio de rol `admin` ↔ `operario` desde la interfaz.
 
 ---
 

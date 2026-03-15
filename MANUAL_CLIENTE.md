@@ -1,130 +1,102 @@
-# Manual de entrega: CTCFuelTrack
+# Manual de Usuario: CTCFuelTrack ⛽
 
-**Resumen:**
-- **Producto:** CTCFuelTrack — aplicación web para gestión y registro de repostajes de gasoil en maquinaria distribuida.
-- **Stack:** Frontend: React 18 + Vite + TypeScript + Tailwind. Backend: FastAPI (Python). DB/Auth: Supabase (Postgres + Auth).
-
-**Contacto de soporte:**
-- Equipo técnico: Responsable del proyecto (proveer contacto del equipo si aplica).
-
-**Contenido del documento:**
-- **Características funcionales**
-- **Arquitectura**
-- **Instalación y ejecución local**
-- **Variables de entorno**
-- **Despliegue en producción**
-- **CI / CD**
-- **Pruebas**
-- **Seguridad y buenas prácticas**
-- **Listado de archivos y rutas relevantes**
-
-**Características funcionales**
-- Autenticación de operarios mediante Supabase Auth.
-- Alta y gestión de maquinaria por centro operativo.
-- Registro manual de repostajes (interfaz tipo TPV).
-- Endpoint API para recepción automática desde surtidores físicos (Bridge API).
-- Validaciones: bloqueo de repostajes que superen la capacidad del depósito.
-- Dashboard con consumos recientes e inventario.
-
-**Arquitectura**
-- Frontend (SPA) consume la API de backend y Supabase directamente para operaciones cliente-compatibles.
-- Backend (FastAPI) hace de puente para validaciones y para inserciones protegidas en Supabase.
-- Base de datos y auth gestionados por Supabase; reglas RLS deben estar activas para limitar accesos.
-
-**Instalación y ejecución local**
-- Requisitos:
-  - Node.js 18+ para frontend
-  - Python 3.11+ para backend
-  - Cuenta y proyecto Supabase con las tablas y migraciones aplicadas
-
-- Preparación de la DB:
-  - Ejecutar el script `supabase_migration.sql` en la consola SQL de Supabase.
-
-- Frontend (local):
-  ```bash
-  cd frontend
-  npm install
-  npm run dev
-  ```
-  App disponible en `http://localhost:5173`.
-
-- Backend (local):
-  ```bash
-  cd backend
-  python -m pip install -r requirements.txt
-  uvicorn main:app --reload
-  ```
-  API disponible en `http://localhost:8000`.
-
-**Variables de entorno**
-- Archivos de ejemplo añadidos: `./.env.example` y `./frontend/.env.example`.
-- Variables necesarias:
-  - Frontend (`frontend/.env`): `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
-  - Backend (`backend/.env` o raíz): `SUPABASE_URL`, `SUPABASE_ANON_KEY`.
-  - (Opcional, solo backend) `SUPABASE_SERVICE_ROLE_KEY` para operaciones privilegiadas — mantenerla secreta.
-
-**Despliegue en producción**
-- Frontend (opciones recomendadas): Vercel, Netlify o GitHub Pages.
-  - Build command: `npm run build` (desde `frontend/`). Output: `frontend/dist`.
-  - Si se usa GitHub Pages, el workflow `deploy-frontend.yml` ya publica `frontend/dist` a `gh-pages`.
-
-- Backend (opciones recomendadas): Render, Railway, Fly.io o contenedor en cualquier proveedor.
-  - `backend/Dockerfile` incluido para desplegar como contenedor.
-  - Start command en PaaS: `uvicorn main:app --host 0.0.0.0 --port $PORT`.
-  - El repositorio contiene workflow para construir y publicar la imagen en GHCR: `.github/workflows/build-and-push-backend.yml`.
-
-**CI / CD**
-- `CI` workflow (`.github/workflows/ci.yml`) ejecuta tests frontend y backend en push/PR.
-- `deploy-frontend.yml` despliega `frontend/dist` a GitHub Pages en `main`.
-- `build-and-push-backend.yml` construye y publica la imagen del backend en GHCR; se adaptó para generar tags en minúsculas y localizar `Dockerfile`.
-
-**Pruebas**
-- Backend: `pytest` (archivo de pruebas ejemplo en `backend/test_main.py`).
-  ```bash
-  cd backend
-  pip install -r requirements.txt
-  pip install pytest
-  pytest
-  ```
-- Frontend: `vitest`
-  ```bash
-  cd frontend
-  npm ci
-  npm run test
-  ```
-
-**Seguridad y buenas prácticas**
-- Nunca subir archivos `.env` con credenciales. Usar `secrets` en GitHub para las variables sensibles.
-- Usar la `anon key` en el frontend (clave pública) y mantener las `service role` solo en backend.
-- Revisar y activar Row Level Security (RLS) en Supabase para garantizar accesos mínimos.
-
-**Soporte y mantenimiento**
-- Actualizaciones:
-  - Dependencias frontend: actualizar `package.json` y ejecutar `npm audit` periódicamente.
-  - Dependencias backend: mantener `requirements.txt` actualizado y revisar vulnerabilidades.
-- Backups: configurar backups periódicos para la base de datos en Supabase.
-
-**Listado de archivos y rutas relevantes**
-- `frontend/` — código cliente (React + Vite)
-- `frontend/package.json` — scripts y deps frontend
-- `frontend/.env.example` — variables frontend (VITE_*)
-- `backend/` — API FastAPI
-- `backend/requirements.txt` — deps Python
-- `backend/Dockerfile` — Dockerfile para backend
-- `backend/test_main.py` — tests backend ejemplo
-- `supabase_migration.sql` — script de migración/DB
-- `.github/workflows/ci.yml` — CI tests
-- `.github/workflows/deploy-frontend.yml` — deploy frontend a Pages
-- `.github/workflows/build-and-push-backend.yml` — build/push GHCR
-- `README.md` — instrucciones de uso y despliegue rápidas
-
-**Entrega y handover**
-1. Proveer acceso a la organización/repo en GitHub y habilitar `Actions` y `Packages` si procede.
-2. Proveer las claves `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` para entornos (agregarlas como GitHub Secrets o en panel del host del frontend).
-3. Para producción, crear un servicio en Render/Railway o habilitar GHCR y desplegar el contenedor del backend.
-
-**Anexos**
-- Incluir credenciales, URLs y contactos en documento separado y seguro (no dentro del repo).
+**CTCFuelTrack** es la solución integral de Veolia para la gestión, control y monitorización de repostajes de gasoil en tiempo real.
 
 ---
-Fecha de generación: 2026-03-14
+
+## 📊 Arquitectura del Sistema
+
+```mermaid
+graph TD
+    A[Operario] -->|Registro Manual| B(App Web)
+    C[Surtidor Físico] -->|API Automática| B
+    B --> D{Supabase}
+    D -->|Auth/Roles| E[Perfiles]
+    D -->|Datos| F[Centros/Máquinas/Consumo]
+    G[Admin] -->|Gestión Total| B
+```
+
+---
+
+## 📋 Índice
+
+1. [Acceso y Seguridad](#-acceso-y-seguridad)
+2. [Roles de Usuario](#-roles-de-usuario)
+3. [Flujo de Administración (Admin)](#-flujo-de-administración-admin)
+4. [Operaciones Diarias (Operario)](#-operaciones-diarias)
+5. [Dashboard e Inteligencia de Datos](#-dashboard-e-inteligencia-de-datos)
+
+---
+
+## 🔐 Acceso y Seguridad
+
+- **URL Personalizada**: Acceso desde cualquier dispositivo móvil o PC.
+- **Autenticación Estricta**: Requiere correo corporativo y contraseña.
+- **RLS (Row Level Security)**: Los datos están protegidos a nivel de base de datos; solo los autorizados pueden ver o modificar registros.
+
+---
+
+## 👥 Roles de Usuario
+
+| Rol | Privilegios | Visualización |
+|:---:|:---|:---|
+| **Operario** | Registro de repostajes y visor de dashboard básico. | Menú simplificado. |
+| **Admin** | Gestión de centros, máquinas, usuarios e historial total. | Menú de Administración completo + Badge Dorado. |
+
+---
+
+## ⚙️ Flujo de Administración (Admin)
+
+### 1. Configuración de Centros y Máquinas
+Antes de operar, el administrador debe definir la infraestructura:
+
+```mermaid
+sequenceDiagram
+    Admin->>Panel: Crea Centro Operativo (ej. Móstoles)
+    Admin->>Panel: Da de alta Máquina
+    Note over Panel: Define capacidad y tipo de medición (Horas/Km)
+    Panel->>Supabase: Guarda configuración
+```
+
+### 2. Gestión de Usuarios
+- En el panel de **Usuarios**, el administrador puede promover operarios a administradores con un solo clic.
+- **Bajas**: El borrado de máquinas o centros incluye advertencias de borrado en cascada para evitar pérdida accidental de datos.
+
+---
+
+## ⛽ Operaciones Diarias
+
+### Registro Manual (TPV)
+El operario realiza el repostaje y lo registra inmediatamente:
+
+1. **Selección**: Escoge la máquina por su código (ej. `EXC-001`).
+2. **Litros**: Introduce la cantidad exacta.
+3. **Lectura**: Introduce el contador actual (Horas o Km).
+4. **Validación**: El sistema bloquea registros si superan la capacidad técnica del depósito.
+
+---
+
+## 📈 Dashboard e Inteligencia de Datos
+
+El Dashboard es el corazón analítico de la aplicación:
+
+### Gráfico de Tendencias
+Visualiza el volumen de repostaje de los **últimos 15 días**. Permite identificar picos de actividad o consumos inusuales de forma visual.
+
+### Filtros Inteligentes
+- **Filtro por Centro**: Selecciona un centro operativo para que todas las tarjetas de estadísticas (Litros totales, Máquinas activas) y el gráfico se actualicen automáticamente para esa ubicación específica.
+
+### Historial de Consumo (Admin)
+- Tabla paginada con búsqueda avanzada por fecha y máquina.
+- Eliminación de registros erróneos para mantener la integridad de los informes.
+
+---
+
+## 🚨 Soporte Técnico
+Si encuentras errores de sesión o permisos:
+1. Asegúrate de que tu usuario tiene asignado el perfil correcto en la sección de Administración.
+2. Si la aplicación no carga, realiza un "Hard Refresh" (Ctrl + Shift + R).
+
+---
+*CTCFuelTrack - Veolia v1.2*
+*Marzo 2026*

@@ -10,7 +10,8 @@ export default function AltaMaquina() {
   const [formData, setFormData] = useState({
     codigo_interno: '',
     capacidad_deposito: '',
-    centro_id: ''
+    centro_id: '',
+    tipo_medicion: 'horas'
   });
 
   useEffect(() => {
@@ -30,7 +31,8 @@ export default function AltaMaquina() {
       {
         codigo_interno: formData.codigo_interno,
         capacidad_deposito: Number(formData.capacidad_deposito),
-        centro_id: formData.centro_id
+        centro_id: formData.centro_id,
+        tipo_medicion: formData.tipo_medicion
       }
     ]);
 
@@ -40,7 +42,7 @@ export default function AltaMaquina() {
       setStatus({ type: 'error', msg: error.message || 'Error al guardar la máquina.' });
     } else {
       setStatus({ type: 'success', msg: 'Máquina registrada correctamente.' });
-      setFormData({ codigo_interno: '', capacidad_deposito: '', centro_id: '' });
+      setFormData({ codigo_interno: '', capacidad_deposito: '', centro_id: '', tipo_medicion: 'horas' });
     }
   };
 
@@ -87,6 +89,36 @@ export default function AltaMaquina() {
               onChange={(e) => setFormData({...formData, capacidad_deposito: e.target.value})}
               placeholder="Ej. 250"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Tipo de Medición
+            </label>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                className={`py-2 px-4 rounded-lg border font-medium transition-colors ${
+                  formData.tipo_medicion === 'horas' 
+                    ? 'bg-veolia-50 border-veolia-200 text-veolia-700' 
+                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                }`}
+                onClick={() => setFormData({...formData, tipo_medicion: 'horas'})}
+              >
+                Horas (L/h)
+              </button>
+              <button
+                type="button"
+                className={`py-2 px-4 rounded-lg border font-medium transition-colors ${
+                  formData.tipo_medicion === 'km' 
+                    ? 'bg-veolia-50 border-veolia-200 text-veolia-700' 
+                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                }`}
+                onClick={() => setFormData({...formData, tipo_medicion: 'km'})}
+              >
+                Kilómetros (L/100km)
+              </button>
+            </div>
           </div>
 
           <div>

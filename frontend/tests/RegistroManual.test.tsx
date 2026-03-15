@@ -60,10 +60,12 @@ describe('RegistroManual Component', () => {
     // Seleccionar la máquina y poner un valor mayor a 200
     const select = screen.getByLabelText(/Seleccionar Máquina/i);
     const inputLitros = screen.getByLabelText(/Litros Repostados/i);
+    const inputLectura = screen.getByLabelText(/Lectura Actual/i);
     const btnSubmit = screen.getByRole('button', { name: /Confirmar Repostaje/i });
 
     fireEvent.change(select, { target: { value: '1' } });
     fireEvent.change(inputLitros, { target: { value: '250' } });
+    fireEvent.change(inputLectura, { target: { value: '1000' } });
     fireEvent.click(btnSubmit);
 
     // Esperar validación
