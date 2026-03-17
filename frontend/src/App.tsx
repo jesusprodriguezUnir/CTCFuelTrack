@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { Home, Droplet, Fuel, LogOut, Shield, Factory, Wrench, ClipboardList, Users } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
-import AltaMaquina from './pages/AltaMaquina';
 import RegistroManual from './pages/RegistroManual';
 import Login from './pages/Login';
 import GestionCentros from './pages/GestionCentros';
@@ -130,7 +129,6 @@ function AppRoutes() {
       <main className="flex-1 p-8 overflow-y-auto">
         <Routes>
           <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/alta-maquina" element={<ProtectedRoute><AltaMaquina /></ProtectedRoute>} />
           <Route path="/registro-manual" element={<ProtectedRoute><RegistroManual /></ProtectedRoute>} />
           <Route path="/admin/centros" element={<AdminRoute><GestionCentros /></AdminRoute>} />
           <Route path="/admin/maquinas" element={<AdminRoute><GestionMaquinas /></AdminRoute>} />

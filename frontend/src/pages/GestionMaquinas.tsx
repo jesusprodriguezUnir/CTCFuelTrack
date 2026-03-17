@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Wrench, Pencil, Trash2, Check, X, AlertCircle, Filter } from 'lucide-react';
+import { Wrench, Pencil, Trash2, Check, X, AlertCircle, Filter, Plus } from 'lucide-react';
 
 interface Maquina {
   id: string;
@@ -27,6 +27,15 @@ export default function GestionMaquinas() {
   const [confirmDelete, setConfirmDelete] = useState<Maquina | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
+  
+  const [mostrandoFormCrear, setMostrandoFormCrear] = useState(false);
+  const [creando, setCreando] = useState(false);
+  const [nuevaMaquina, setNuevaMaquina] = useState({
+    codigo_interno: '',
+    capacidad_deposito: '',
+    tipo_medicion: 'horas',
+    centro_id: ''
+  });
 
   const showToast = (type: 'success' | 'error', msg: string) => {
     setToast({ type, msg });
@@ -64,6 +73,27 @@ export default function GestionMaquinas() {
     loadData();
   };
 
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!nuevaMaquina.centro_id) {
+      showToast('error', 'Debes seleccionar un centro.');
+      return;
+    }
+    setCreando(true);
+    const { error } = await supabase.from('maquinaria').insert([{
+      codigo_interno: nuevaMaquina.codigo_interno,
+      capacidad_deposito: Number(nuevaMaquina.capacidad_deposito),
+      tipo_medicion: nuevaMaquina.tipo_medicion,
+      centro_id: nuevaMaquina.centro_id
+    }]);
+    setCreando(false);
+    if (error) { showToast('error', error.message); return; }
+    showToast('success', 'Máquina creada correctamente.');
+    setNuevaMaquina({ codigo_interno: '', capacidad_deposito: '', tipo_medicion: 'horas', centro_id: '' });
+    setMostrandoFormCrear(false);
+    loadData();
+  };
+
   const handleDelete = async () => {
     if (!confirmDelete || deleting) return;
     setDeleting(true);
@@ -95,12 +125,21 @@ export default function GestionMaquinas() {
           <Wrench size={28} className="text-veolia-600" />
           <h2 className="text-3xl font-bold text-gray-800">Mantenimiento de Máquinas</h2>
         </div>
-        <div className="flex items-center gap-2">
-          <Filter size={16} className="text-gray-400" />
-          <select className="input-field py-2 text-sm" value={filtrosCentro} onChange={e => setFiltroCentro(e.target.value)}>
-            <option value="">Todos los centros</option>
-            {centros.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
-          </select>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Filter size={16} className="text-gray-400" />
+            <select className="input-field py-2 text-sm" value={filtrosCentro} onChange={e => setFiltroCentro(e.target.value)}>
+              <option value="">Todos los centros</option>
+              {centros.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+            </select>
+          </div>
+          <button 
+            onClick={() => setMostrandoFormCrear(!mostrandoFormCrear)}
+            className="btn-primary py-2 px-4 text-sm flex items-center gap-2"
+          >
+            {mostrandoFormCrear ? <X size={16} /> : <Plus size={16} />}
+            {mostrandoFormCrear ? 'Cancelar' : 'Nueva Máquina'}
+          </button>
         </div>
       </div>
 
@@ -108,6 +147,68 @@ export default function GestionMaquinas() {
         <div className={`mb-4 p-4 rounded-lg flex items-center gap-3 ${toast.type === 'success' ? 'bg-veolia-50 text-veolia-800 border border-veolia-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>
           {toast.type === 'success' ? <Check size={18} /> : <AlertCircle size={18} />}
           {toast.msg}
+        </div>
+      )}
+
+      {mostrandoFormCrear && (
+        <div className="card p-6 mb-8 bg-gray-50 border-gray-200">
+          <h3 className="text-lg font-bold text-gray-800 mb-4 ">Registrar Nueva Máquina</h3>
+          <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Código Interno</label>
+              <input 
+                type="text" 
+                required 
+                className="input-field py-2 text-sm" 
+                placeholder="Ex: EXC-001"
+                value={nuevaMaquina.codigo_interno}
+                onChange={e => setNuevaMaquina({...nuevaMaquina, codigo_interno: e.target.value})}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Capacidad (L)</label>
+              <input 
+                type="number" 
+                required 
+                className="input-field py-2 text-sm" 
+                placeholder="0.00"
+                value={nuevaMaquina.capacidad_deposito}
+                onChange={e => setNuevaMaquina({...nuevaMaquina, capacidad_deposito: e.target.value})}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Medición</label>
+              <select 
+                className="input-field py-2 text-sm"
+                value={nuevaMaquina.tipo_medicion}
+                onChange={e => setNuevaMaquina({...nuevaMaquina, tipo_medicion: e.target.value})}
+              >
+                <option value="horas">Horas</option>
+                <option value="km">Km</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Centro Operativo</label>
+              <select 
+                required
+                className="input-field py-2 text-sm"
+                value={nuevaMaquina.centro_id}
+                onChange={e => setNuevaMaquina({...nuevaMaquina, centro_id: e.target.value})}
+              >
+                <option value="">Selecciona centro...</option>
+                {centros.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+              </select>
+            </div>
+            <div className="md:col-span-4 flex justify-end">
+              <button 
+                type="submit" 
+                disabled={creando}
+                className="btn-primary py-2 px-6 flex items-center gap-2"
+              >
+                {creando ? 'Guardando...' : <><Check size={18} /> Confirmar Alta</>}
+              </button>
+            </div>
+          </form>
         </div>
       )}
 
